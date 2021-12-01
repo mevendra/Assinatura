@@ -43,7 +43,7 @@ public class DesafioController {
 		return "verifyForm";
 	}
 	
-	@PostMapping("/signature")
+	@PostMapping("/signature/")
 	public ResponseEntity<AssinaturaRetorno> handleSignature( 
 								@RequestParam(required=true) MultipartFile fileToSign,
 								@RequestParam(required=true) MultipartFile filePFX,
@@ -75,7 +75,7 @@ public class DesafioController {
 		}
 	}
 	
-	@PostMapping("/verify")
+	@PostMapping("/verify/")
 	public ResponseEntity<ValidacaoRetorno> handleVerify( 	@RequestParam(required=true) MultipartFile fileToVerify) {
 		
 		boolean ehValida = false;
@@ -93,14 +93,14 @@ public class DesafioController {
 		return ResponseEntity.ok(ret);
 	}
 	
-	@GetMapping("/verify")
+	@GetMapping("/verify/")
 	public String handleVerify() {
 		System.out.println("handleVerify");
 
 		return "redirect:/verifyForm";
 	}
 	
-	@GetMapping("/signature")
+	@GetMapping("/signature/")
 	public String handleSignature() {
 		System.out.println("handleSignature");
 

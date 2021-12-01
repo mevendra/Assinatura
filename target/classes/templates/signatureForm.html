@@ -1,13 +1,13 @@
 <html xmlns:th="https://www.thymeleaf.org">
 <body>
 	<div>
-		<form method="POST" enctype="multipart/form-data" action="/signature">
+		<form method="POST" enctype="multipart/form-data" action="/signature/">
 			<table>
 				<tr><td>File to sign:</td><td><input type="file" name="fileToSign" required/></td></tr>
 				<tr><td>Pfx file:</td><td><input type="file" name="filePFX" required /></td></tr>
 				<tr><td>Alias:</td><td><input type="text" name="alias" required value="f22c0321-1a9a-4877-9295-73092bb9aa94" /></td></tr>
 				<tr><td>Senha:</td><td><input type="text" name="senha" required value="123456789"/></td></tr>
-				<tr><td></td><td><input type="submit" value="Upload" /></td></tr>
+				<tr><td></td><td><input type="submit" value="Enviar" /></td></tr>
 			</table>
 		</form>
 	</div>
