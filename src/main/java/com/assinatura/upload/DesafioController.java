@@ -13,10 +13,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.assinatura.erro.ErrorMessage;
 
 import modelo.Arquivo;
 import modelo.ArquivoAssinado;
@@ -48,10 +53,11 @@ public class DesafioController {
 								@RequestParam(required=true) MultipartFile fileToSign,
 								@RequestParam(required=true) MultipartFile filePFX,
 								@RequestParam(required=true) String alias,
-								@RequestParam(required=true) String senha) {
+								@RequestParam(required=true) String senha) throws Exception {
 		
-		try {
-			if (filePFX.getContentType().equals("application/x-pkcs12")) {
+		
+		if (filePFX.getContentType().equals("application/x-pkcs12")) {
+			try {
 				Arquivo arq = new Arquivo(fileToSign.getBytes());
 				Assinatura assina = new Assinatura(filePFX.getBytes(), alias, senha.toCharArray());
 				
@@ -60,18 +66,18 @@ public class DesafioController {
 				AssinaturaRetorno ret = new AssinaturaRetorno(signed);
 				
 				return ResponseEntity.ok(ret);
-			} else {
-				return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
+			} catch (NoSuchAlgorithmException|KeyStoreException|CertificateException|UnrecoverableKeyException|OperatorCreationException|CMSException e) {
+				System.out.println(e);
+				throw new Exception("Um erro aconteceu durante a criação de certificados");
+			} catch (IOException e) {
+				System.out.println(e);
+				throw new Exception("Um erro aconteceu ao lidar com um dos arquivos");
+			} catch (Exception e) {
+				System.out.println(e);
+				throw new Exception("Um erro não esperado aconteceu");
 			}
-		} catch (NoSuchAlgorithmException|KeyStoreException|CertificateException|UnrecoverableKeyException|OperatorCreationException|CMSException e) {
-			System.out.println(e);
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		} catch (IOException e) {
-			System.out.println(e);
-			return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
-		} catch (Exception e) {
-			System.out.println(e);
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		} else {
+			throw new Exception("Arquivo PFX não está no formato correto");
 		}
 	}
 	
@@ -105,5 +111,14 @@ public class DesafioController {
 		System.out.println("handleSignature");
 
 		return "redirect:/signatureForm";
+	}
+	
+	@ResponseStatus(value=HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(Exception.class)
+	@ResponseBody
+	public ErrorMessage handlerException(Exception e) {
+		ErrorMessage erro = new ErrorMessage(e.getMessage(), e.getClass().getName());		
+		
+		return erro;
 	}
 }
